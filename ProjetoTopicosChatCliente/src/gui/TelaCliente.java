@@ -10,6 +10,7 @@ import data.CustomListModel;
 import data.ServidorChatInterface;
 import java.rmi.Naming;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -48,18 +49,20 @@ public class TelaCliente extends javax.swing.JFrame {
         txtMsgs = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtLogCliente = new javax.swing.JTextArea();
-        txtServidor = new javax.swing.JTextField();
         txtCliente = new javax.swing.JTextField();
         pnlClienteConectados = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listClientes = new javax.swing.JList<>();
         lblLog = new javax.swing.JLabel();
+        txtPortaServidor = new javax.swing.JTextField();
+        txtServidor = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lblConexao.setText("Conectado ao servidor:");
 
         btnServidor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/if_server_lightning_36421 (1).png"))); // NOI18N
+        btnServidor.setEnabled(false);
         btnServidor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnServidorActionPerformed(evt);
@@ -73,7 +76,10 @@ public class TelaCliente extends javax.swing.JFrame {
             }
         });
 
+        txtMsgEnviar.setEnabled(false);
+
         btnEnviar.setText("Enviar");
+        btnEnviar.setEnabled(false);
         btnEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEnviarActionPerformed(evt);
@@ -84,23 +90,19 @@ public class TelaCliente extends javax.swing.JFrame {
 
         txtMsgs.setColumns(20);
         txtMsgs.setRows(5);
+        txtMsgs.setEnabled(false);
         jScrollPane2.setViewportView(txtMsgs);
 
         txtLogCliente.setColumns(20);
         txtLogCliente.setRows(5);
+        txtLogCliente.setEnabled(false);
         jScrollPane3.setViewportView(txtLogCliente);
-
-        txtServidor.setEnabled(false);
 
         txtCliente.setEnabled(false);
 
         pnlClienteConectados.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes conectados"));
 
-        listClientes.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "TODOS" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        listClientes.setEnabled(false);
         listClientes.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 listClientesValueChanged(evt);
@@ -112,9 +114,9 @@ public class TelaCliente extends javax.swing.JFrame {
         pnlClienteConectados.setLayout(pnlClienteConectadosLayout);
         pnlClienteConectadosLayout.setHorizontalGroup(
             pnlClienteConectadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlClienteConectadosLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlClienteConectadosLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 7, Short.MAX_VALUE))
         );
         pnlClienteConectadosLayout.setVerticalGroup(
             pnlClienteConectadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,6 +128,10 @@ public class TelaCliente extends javax.swing.JFrame {
 
         lblLog.setText("Log:");
 
+        txtPortaServidor.setEnabled(false);
+
+        txtServidor.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -134,7 +140,7 @@ public class TelaCliente extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblNomeCliente)
                                 .addGap(5, 5, 5)
@@ -142,7 +148,9 @@ public class TelaCliente extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblConexao)
                                 .addGap(5, 5, 5)
-                                .addComponent(txtServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(txtServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtPortaServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnApelido, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(3, 3, 3)
@@ -154,14 +162,14 @@ public class TelaCliente extends javax.swing.JFrame {
                     .addComponent(jScrollPane2))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(pnlClienteConectados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                        .addGap(5, 5, 5)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblLog)
+                            .addComponent(pnlClienteConectados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLog)))
-                .addGap(13, 13, 13))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -188,6 +196,7 @@ public class TelaCliente extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblConexao)
+                                .addComponent(txtPortaServidor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtServidor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(pnlClienteConectados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(5, 5, 5)
@@ -201,7 +210,7 @@ public class TelaCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnServidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnServidorActionPerformed
-        ConfigServidor configServ = new ConfigServidor(this, cliente);
+        ConfigServidor configServ = new ConfigServidor(this, cliente, getTxtServidor().getText(), getTxtPortaServidor().getText());
         configServ.setVisible(true);
     }//GEN-LAST:event_btnServidorActionPerformed
 
@@ -211,31 +220,41 @@ public class TelaCliente extends javax.swing.JFrame {
     }//GEN-LAST:event_btnApelidoActionPerformed
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
-        String ipServidor = "localhost";
-        String portaServidor = "1099";
+        //Carrega o ip e porta do servidor que está conectado
+        String ipServidor = txtServidor.getText();
+        String portaServidor = txtPortaServidor.getText();
+
+        //Tenta enviar a mensagem para o servidor encaminhar ao outro cliente
         try {
             ServidorChatInterface servidor = (ServidorChatInterface) Naming.lookup("rmi://" + ipServidor + ":" + portaServidor + "/chat");
-            
-            for(Cliente c : clientesConectados){
-                if(c.getApelido().equals(listClientes.getSelectedValue())) c.setLogMensagens(c.getLogMensagens() + "\n" + txtMsgEnviar.getText());
+            //Envia a mensagem ao servidor
+            int validacao = servidor.receberMensagemCliente(cliente.getApelido(), getListClientes().getSelectedValue(), getTxtMsgEnviar().getText());
+
+            if (validacao == 0) { //Caso a mensagem foi recebida
+                for (Cliente c : clientesConectados) { //Pesquisa o cliente selecionado no array
+                    if (c.getApelido().equals(getListClientes().getSelectedValue())) { //Ao encontrar, altera os valores do log de mensagens
+                        c.setLogMensagens(c.getLogMensagens() + "\nVocê: " + getTxtMsgEnviar().getText());
+                        txtMsgs.setText(c.getLogMensagens());
+                    }
+                }
+            }else{ //Caso a mensagem não foi recebida
+                JOptionPane.showMessageDialog(null, "Não foi possível enviar a mensagem");
             }
             
-            servidor.receberMensagemCliente(cliente.getApelido(), listClientes.getSelectedValue(), txtMsgEnviar.getText());
-            txtMsgEnviar.setText("");
+            getTxtMsgEnviar().setText("");
         } catch (Exception e) {
             System.out.println("Erro: Mensagem: " + e.getMessage());
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void listClientesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listClientesValueChanged
-        for (Cliente c : clientesConectados) {
-            if (c.getApelido().equals(listClientes.getSelectedValue())) {
+        //Selecionando qual cliente o usuário deseja ver as mensagens
+        for (Cliente c : clientesConectados) { //Pesquisa o cliente no array de objetos
+            if (c.getApelido().equals(getListClientes().getSelectedValue())) { //Quando encontrar atualizar a tela
                 txtMsgs.setText(c.getLogMensagens());
                 break;
             }
         }
-
-
     }//GEN-LAST:event_listClientesValueChanged
 
     /**
@@ -289,6 +308,7 @@ public class TelaCliente extends javax.swing.JFrame {
     private javax.swing.JTextArea txtLogCliente;
     private javax.swing.JTextField txtMsgEnviar;
     private javax.swing.JTextArea txtMsgs;
+    private javax.swing.JTextField txtPortaServidor;
     private javax.swing.JTextField txtServidor;
     // End of variables declaration//GEN-END:variables
 
@@ -308,7 +328,7 @@ public class TelaCliente extends javax.swing.JFrame {
 
     public void retornaCliente(Cliente cliente) {
         this.cliente = cliente;
-        txtCliente.setText(cliente.getNome());
+        getTxtCliente().setText(cliente.getNome());
     }
 
     /**
@@ -325,6 +345,61 @@ public class TelaCliente extends javax.swing.JFrame {
         this.txtMsgs = txtMsgs;
     }
 
+    public void insereClienteLista(String apelido) {
+        Cliente c = new Cliente(null);
+        c.setApelido(apelido);
+        getTxtLogCliente().append("Cliente: " + c.getApelido() + " está conectado ao servidor.\n");
+        clientesConectados.add(c);
+        list_model.addCliente(c);
+
+        //Testes
+        System.out.println("Cliente conectado array");
+        for (Cliente cl : clientesConectados) {
+            System.out.println("Cliente conectado: " + cl.getApelido());
+        }
+
+        System.out.println("Cliente conectado lista");
+        for (int i = 0; i <= list_model.getSize(); i++) {
+            System.out.println("Cliente conectado: " + i + list_model.getCliente(i).getApelido());
+        }
+    }
+
+    public void atualizaMensagemCliente(String apelido, String mensagem) {
+        for (Cliente c : clientesConectados) { //Pesquiso o cliente respectivo para atualizar seu log de mensagens
+            if (c.getApelido().equals(apelido)) {
+                c.setLogMensagens(c.getLogMensagens() + "\n" + apelido + ": " + mensagem);
+            }
+        }
+    }
+
+    public void removeClienteLista(String apelido) {
+        for (Cliente c : clientesConectados) { //Pesquisa o cliente com o nome a ser desconectado
+            if (c.getApelido().equals(apelido)) {
+                for (int i = 0; i <= list_model.getSize(); i++) { //Pesquisa no list_model o cliente
+                    if (c == list_model.getCliente(i)) { //Se o cliente no array for igual ao cliente no list_model, então remove
+                        getTxtLogCliente().append("Cliente " + apelido + " se desconectou.\n");
+                        clientesConectados.remove(c);
+                        list_model.removeCliente(i);
+                    }
+                }
+            }
+        }
+    }
+
+    public void atualizaDadosServidor(String ip, String porta) {
+        txtServidor.setText(ip);
+        txtPortaServidor.setText(porta);
+    }
+
+    public void atualizaTelaConectaDesconecta(boolean acao) {
+        btnApelido.setEnabled(!acao);
+        txtMsgEnviar.setEnabled(acao);
+        listClientes.setEnabled(acao);
+        btnEnviar.setEnabled(acao);
+        txtLogCliente.setText("");
+        txtMsgs.setText("");
+    }
+
     /**
      * @return the txtServidor
      */
@@ -339,30 +414,101 @@ public class TelaCliente extends javax.swing.JFrame {
         this.txtServidor = txtServidor;
     }
 
-    public void insereClienteLista(String apelido) {
-        Cliente c = new Cliente(null);
-        c.setApelido(apelido);
-        clientesConectados.add(c);
-        list_model.addCliente(c);
+    /**
+     * @return the txtPortaServidor
+     */
+    public javax.swing.JTextField getTxtPortaServidor() {
+        return txtPortaServidor;
     }
 
-    public void atualizaMensagemCliente(String apelido, String mensagem) {
-        for (Cliente c : clientesConectados) {
-            if (c.getApelido().equals(apelido)) {
-                System.out.println(c.getLogMensagens() + "\n" + mensagem);
-                c.setLogMensagens(c.getLogMensagens() + "\n" + mensagem);
-            }
-        }
+    /**
+     * @param txtPortaServidor the txtPortaServidor to set
+     */
+    public void setTxtPortaServidor(javax.swing.JTextField txtPortaServidor) {
+        this.txtPortaServidor = txtPortaServidor;
     }
 
-    public void removeClienteLista(String apelido) {
-        int i;
-        for (i = 0; i < list_model.getSize(); i++) {
-            if (apelido.equals(list_model.getElementAt(i))) {
-                clientesConectados.remove(list_model.getCliente(i));
-                break;
-            }
-        }
-        list_model.removeCliente(i);
+    /**
+     * @return the btnServidor
+     */
+    public javax.swing.JButton getBtnServidor() {
+        return btnServidor;
+    }
+
+    /**
+     * @param btnServidor the btnServidor to set
+     */
+    public void setBtnServidor(javax.swing.JButton btnServidor) {
+        this.btnServidor = btnServidor;
+    }
+
+    /**
+     * @return the btnApelido
+     */
+    public javax.swing.JButton getBtnApelido() {
+        return btnApelido;
+    }
+
+    /**
+     * @param btnApelido the btnApelido to set
+     */
+    public void setBtnApelido(javax.swing.JButton btnApelido) {
+        this.btnApelido = btnApelido;
+    }
+
+    /**
+     * @return the txtCliente
+     */
+    public javax.swing.JTextField getTxtCliente() {
+        return txtCliente;
+    }
+
+    /**
+     * @param txtCliente the txtCliente to set
+     */
+    public void setTxtCliente(javax.swing.JTextField txtCliente) {
+        this.txtCliente = txtCliente;
+    }
+
+    /**
+     * @return the txtMsgEnviar
+     */
+    public javax.swing.JTextField getTxtMsgEnviar() {
+        return txtMsgEnviar;
+    }
+
+    /**
+     * @param txtMsgEnviar the txtMsgEnviar to set
+     */
+    public void setTxtMsgEnviar(javax.swing.JTextField txtMsgEnviar) {
+        this.txtMsgEnviar = txtMsgEnviar;
+    }
+
+    /**
+     * @return the listClientes
+     */
+    public javax.swing.JList<String> getListClientes() {
+        return listClientes;
+    }
+
+    /**
+     * @param listClientes the listClientes to set
+     */
+    public void setListClientes(javax.swing.JList<String> listClientes) {
+        this.listClientes = listClientes;
+    }
+
+    /**
+     * @return the btnEnviar
+     */
+    public javax.swing.JButton getBtnEnviar() {
+        return btnEnviar;
+    }
+
+    /**
+     * @param btnEnviar the btnEnviar to set
+     */
+    public void setBtnEnviar(javax.swing.JButton btnEnviar) {
+        this.btnEnviar = btnEnviar;
     }
 }

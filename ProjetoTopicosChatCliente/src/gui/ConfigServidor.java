@@ -8,6 +8,7 @@ package gui;
 import data.Cliente;
 import data.ServidorChatInterface;
 import java.rmi.Naming;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -24,10 +25,26 @@ public class ConfigServidor extends javax.swing.JFrame {
      * @param tCliente
      * @param c
      */
-    public ConfigServidor(TelaCliente tCliente, Cliente c) {
+    public ConfigServidor(TelaCliente tCliente, Cliente c, String ip, String porta) {
         initComponents();
         this.tCliente = tCliente;
         this.c = c;
+        txtIpServidor.setText(ip);
+        txtPortaServidor.setText(porta);
+
+        if (c.isConectado()) {
+            txtIpServidor.setEnabled(false);
+            txtPortaServidor.setEnabled(false);
+            btnConectar.setEnabled(false);
+            btnDesconectar.setEnabled(true);
+        }
+    }
+
+    public void mudaEstadoConexao(boolean acao) {
+        txtIpServidor.setEnabled(!acao);
+        txtPortaServidor.setEnabled(!acao);
+        btnConectar.setEnabled(!acao);
+        btnDesconectar.setEnabled(acao);
     }
 
     /**
@@ -41,11 +58,11 @@ public class ConfigServidor extends javax.swing.JFrame {
 
         lblIpServidor = new javax.swing.JLabel();
         lblPortaServidor = new javax.swing.JLabel();
-        txtIpServidor = new javax.swing.JTextField();
         txtPortaServidor = new javax.swing.JTextField();
         btnConectar = new javax.swing.JButton();
         btnDesconectar = new javax.swing.JButton();
         btnSair = new javax.swing.JButton();
+        txtIpServidor = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,6 +78,7 @@ public class ConfigServidor extends javax.swing.JFrame {
         });
 
         btnDesconectar.setText("Desconectar");
+        btnDesconectar.setEnabled(false);
         btnDesconectar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDesconectarActionPerformed(evt);
@@ -82,19 +100,19 @@ public class ConfigServidor extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblIpServidor)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtIpServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(lblPortaServidor)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPortaServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(5, 5, 5)
+                        .addComponent(txtPortaServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblIpServidor)
+                        .addGap(5, 5, 5)
+                        .addComponent(txtIpServidor, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(5, 5, 5)
                 .addComponent(btnConectar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDesconectar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSair, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE)
+                .addComponent(btnSair, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -124,23 +142,40 @@ public class ConfigServidor extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSairActionPerformed
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
-        try {
+        int validacao = 1;
+        try { //Tenta se conectar com o servidor
             ServidorChatInterface servidor = (ServidorChatInterface) Naming.lookup("rmi://" + txtIpServidor.getText() + ":" + txtPortaServidor.getText() + "/chat");
-            servidor.conectar(c.getApelido(), c.getNome(), c.getIp(), String.valueOf(c.getPorta()));
-            tCliente.getTxtServidor().setText(txtIpServidor.getText());
-        }
-        catch(Exception e){
+            validacao = servidor.conectar(c.getApelido(), c.getNome(), c.getIp(), String.valueOf(c.getPorta()));
+            tCliente.atualizaDadosServidor(txtIpServidor.getText(), txtPortaServidor.getText()); //Atualiza os campos da tela principal do cliente
+            c.setConectado(true);
+        } catch (Exception e) {
             System.out.println("Erro: Mensagem: " + e.getMessage());
+        }
+
+        if (validacao == 0) {
+            mudaEstadoConexao(true); //Muda botões em relacao a conexão
+            tCliente.atualizaTelaConectaDesconecta(true); //Ativa tela, copia valores, entre outros
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Falha de conexão!");
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
     private void btnDesconectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDesconectarActionPerformed
-        try{
+        boolean validacao = true;
+        try {
             ServidorChatInterface servidor = (ServidorChatInterface) Naming.lookup("rmi://" + txtIpServidor.getText() + ":" + txtPortaServidor.getText() + "/chat");
             servidor.desconectar(c.getApelido(), c.getIp(), String.valueOf(c.getPorta()));
-            tCliente.getTxtServidor().setText("");
-        }catch(Exception e){
+            tCliente.atualizaDadosServidor("", ""); //Atualiza os campos da tela principal do cliente
+
+        } catch (Exception e) {
             System.out.println("Erro: Mensagem: " + e.getMessage());
+            validacao = false;
+        }
+
+        if (validacao) {
+            mudaEstadoConexao(false); //Muda botões em relacao a conexão
+            tCliente.atualizaTelaConectaDesconecta(false); //Limpa tela, limpa lista de pessoas conectadas, entre outros
         }
     }//GEN-LAST:event_btnDesconectarActionPerformed
 

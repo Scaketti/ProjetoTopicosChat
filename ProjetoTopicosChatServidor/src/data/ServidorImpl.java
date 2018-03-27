@@ -10,9 +10,6 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListModel;
-import sun.rmi.registry.RegistryImpl;
 
 /**
  *
@@ -22,6 +19,7 @@ public class ServidorImpl extends UnicastRemoteObject implements ServidorChatInt
 
     ArrayList<Cliente> clientesConectados = new ArrayList();
     TelaServidor tServidor;
+    ClienteChatInterface cliente;
 
     public ServidorImpl(TelaServidor tela) throws RemoteException {
         super();
@@ -31,21 +29,37 @@ public class ServidorImpl extends UnicastRemoteObject implements ServidorChatInt
     @Override
     public int receberMensagemCliente(String apelidoOrigem, String apelidoDestino, String mensagem) throws RemoteException {
         Cliente clienteDestino = null;
-        for (Cliente c : clientesConectados) {
-            if (c.getApelido().equals(apelidoDestino)) {
-                clienteDestino = c;
-                break;
-            }
-        }
 
-        if (clienteDestino != null) {
+        if (apelidoDestino.equals("TODOS")) { //Mensagem em broadcast
             try {
-                ClienteChatInterface cliente = (ClienteChatInterface) Naming.lookup("rmi://" + clienteDestino.getIp() + ":" + clienteDestino.getPorta() + "/chat");
-                cliente.receberMensagemServidor(apelidoOrigem, mensagem);
-                tServidor.getTxtLog().append("Cliente " + apelidoOrigem + " mandou uma mensagem para " + apelidoDestino + ".\n");
-
+                for (Cliente c : clientesConectados) {
+                    cliente = (ClienteChatInterface) Naming.lookup("rmi://" + c.getIp() + ":" + c.getPorta() + "/chat");
+                    cliente.receberMensagemServidor(apelidoOrigem, mensagem);
+                }
             } catch (Exception e) {
                 System.out.println("Erro: Mensagem: " + e.getMessage());
+                return 1;
+            }
+            tServidor.getTxtLog().append("Cliente " + apelidoOrigem + " mandou uma mensagem para todos.\n");
+            return 0;
+        } else { //Mensagem para um determinado cliente
+            for (Cliente c : clientesConectados) { //Procura o cliente na lista
+                if (c.getApelido().equals(apelidoDestino)) {
+                    clienteDestino = c;
+                    break;
+                }
+            }
+
+            if (clienteDestino != null) { //Caso o cliente esteja na lista, tenta mandar a mensagem
+                try {
+                    cliente = (ClienteChatInterface) Naming.lookup("rmi://" + clienteDestino.getIp() + ":" + clienteDestino.getPorta() + "/chat");
+                    cliente.receberMensagemServidor(apelidoOrigem, mensagem);
+                    tServidor.getTxtLog().append("Cliente " + apelidoOrigem + " mandou uma mensagem para " + apelidoDestino + ".\n");
+                    return 0;
+                } catch (Exception e) {
+                    System.out.println("Erro: Mensagem: " + e.getMessage());
+                    return 1;
+                }
             }
         }
         return 1;
@@ -57,39 +71,25 @@ public class ServidorImpl extends UnicastRemoteObject implements ServidorChatInt
 
         //Verifica se possui algum cliente conectado com o mesmo apelido
         for (Cliente c : clientesConectados) {
-            if (c == null) {
-                break;
-            }
             valido = verificaApelido(apelido, c);
             if (valido) {
-                break;
+                return 1;
             }
         }
 
-        //Caso o apelido for válido, será efetuado a conexão com o servidor
-        if (!valido) {
-            try {
-                ClienteChatInterface cliente = (ClienteChatInterface) Naming.lookup("rmi://" + ipCliente + ":" + portaCliente + "/chat");
-                cliente.receberMensagemServidor("conectou", "");
-            } catch (Exception e) {
-                System.out.println("Erro: Mensagem: " + e.getMessage());
-            }
-
+        if (!valido) { //Caso não exista nenhum cliente com o mesmo nome, tenta conectar
             Cliente clienteConectando = new Cliente(apelido, nome, ipCliente, portaCliente);
-
-            for (Cliente c : clientesConectados) {
-                notificarConexao(clienteConectando, c);
-            }
-
             clientesConectados.add(clienteConectando);
-
-            tServidor.insereClienteLista(clienteConectando);
-
-            tServidor.getTxtLog().append("Cliente " + clienteConectando.getApelido() + " se conectou ao servidor.\n");
-
+            tServidor.insereClienteLista(clienteConectando); //Chama método que insere o cliente na lista da tela
+            
+            for (Cliente cl : clientesConectados) { //Notifica os clientes 
+                if (!cl.getApelido().equals(apelido)) {
+                    notificarConexao(clienteConectando, cl); //Notifica a pessoa que ja está conectada
+                    notificarConexao(cl, clienteConectando); //Recebe "ping" da pessoa que ja está conectada
+                }
+            }
             return 0;
         }
-
         return 1;
     }
 
@@ -99,50 +99,43 @@ public class ServidorImpl extends UnicastRemoteObject implements ServidorChatInt
 
         //Verifica se o mesmo ja está conectado
         for (Cliente c : clientesConectados) {
-            if (c == null) {
-                break;
-            }
             valido = verificaApelido(apelido, c);
-            if (valido) {
+            if (valido) { //Caso ele esteja conectado, notifica a desconexão
+                for (Cliente cl : clientesConectados) {
+                    if (!cl.getApelido().equals(apelido)) {
+                        notificarDesconexao(apelido, cl);
+                    }
+                }
                 clientesConectados.remove(c);
                 tServidor.removeClienteLista(c);
                 break;
             }
         }
-
-        if (valido) {
-            try {
-                ClienteChatInterface cliente = (ClienteChatInterface) Naming.lookup("rmi://" + ipCliente + ":" + portaCliente + "/chat");
-                cliente.receberMensagemServidor("desconectou", "");
-            } catch (Exception e) {
-                System.out.println("Erro: Mensagem: " + e.getMessage());
-            }
-
-            for (Cliente c : clientesConectados) {
-                notificarDesconexao(c);
-            }
-
-            tServidor.getTxtLog().append("Cliente " + apelido + " se desconectou ao servidor.\n");
-        }
     }
 
-    private void notificarConexao(Cliente conectado, Cliente c) {
-        String mensagem = "Cliente: " + conectado.getApelido() + "se conectou ao servidor.";
-        try {
-            ClienteChatInterface cliente = (ClienteChatInterface) Naming.lookup("rmi://" + c.getIp() + ":" + c.getPorta() + "/chat");
-            cliente.receberNovaConexao(conectado.getApelido(), mensagem);
+    private void notificarConexao(Cliente conectando, Cliente c) {
+        try { //Envia uma mensagem ao cliente conectado avisando que alguêm se conectou
+            cliente = (ClienteChatInterface) Naming.lookup("rmi://" + c.getIp() + ":" + c.getPorta() + "/chat");
+            cliente.receberNovaConexao(conectando.getApelido(), conectando.getNome());
         } catch (Exception e) {
-
+            System.out.println("Teste Erro: Mensagem: " + e.getMessage());
         }
-        //envia uma mensagem aos clientes conectados avisando que alguêm foi conectado
     }
 
-    private void notificarDesconexao(Cliente c) {
-        String mensagem = "Cliente: " + c.getApelido() + "se desconectou do servidor.";
-        //envia uma mensagem aos clientes conectados avisando que alguêm foi desconectado
+    private void notificarDesconexao(String apelido, Cliente c) {
+        String mensagem = "Cliente: " + apelido + "se desconectou do servidor.";
+        try { //Envia uma mensagem ao cliente conectado avisando que alguêm se desconectou
+            cliente = (ClienteChatInterface) Naming.lookup("rmi://" + c.getIp() + ":" + c.getPorta() + "/chat");
+            cliente.receberDesconexao(apelido, mensagem);
+        } catch (Exception e) {
+            System.out.println("Erro: Mensagem: " + e.getMessage());
+        }
     }
 
     private Boolean verificaApelido(String apelido, Cliente c) {
+        if (c == null) {
+            return false;
+        }
         return c.getApelido().equals(apelido);
     }
 

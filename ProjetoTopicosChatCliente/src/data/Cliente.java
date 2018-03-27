@@ -19,6 +19,7 @@ public class Cliente {
     private String ip;
     private int porta;
     private String logMensagens;
+    private boolean conectado;
     
     public Cliente(TelaCliente tCliente){
         nome = "";
@@ -26,6 +27,7 @@ public class Cliente {
         ip = "localhost";
         porta = 0;
         logMensagens = "";
+        conectado = false;
     }
 
     /**
@@ -117,6 +119,20 @@ public class Cliente {
         }catch(Exception e){
             System.out.println("Erro : Mensagem : " + e.getMessage());
         }
+    }
+
+    /**
+     * @return the conectado
+     */
+    public boolean isConectado() {
+        return conectado;
+    }
+
+    /**
+     * @param conectado the conectado to set
+     */
+    public void setConectado(boolean conectado) {
+        this.conectado = conectado;
     }
     
 }

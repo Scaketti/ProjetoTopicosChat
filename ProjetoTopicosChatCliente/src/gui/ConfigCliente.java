@@ -129,7 +129,8 @@ public class ConfigCliente extends javax.swing.JFrame {
             c.setPorta(Integer.parseInt(txtPortaCliente.getText()));
             tCliente.retornaCliente(c);
             c.registraCliente(tCliente);
-            
+            tCliente.getBtnServidor().setEnabled(true);
+            tCliente.clientesConectados.add(c);
             this.dispose();
             
         }catch(Exception e){

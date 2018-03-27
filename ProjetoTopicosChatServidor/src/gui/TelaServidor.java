@@ -14,9 +14,10 @@ import data.Servidor;
  * @author Scaketti
  */
 public class TelaServidor extends javax.swing.JFrame {
-    
+
     Cliente cliente;
     CustomListModel list_model = new CustomListModel();
+
     /**
      * Creates new form TelaServidor
      */
@@ -50,6 +51,7 @@ public class TelaServidor extends javax.swing.JFrame {
 
         txtLog.setColumns(20);
         txtLog.setRows(5);
+        txtLog.setEnabled(false);
         jScrollPane2.setViewportView(txtLog);
 
         btnRegistrar.setText("Registrar Servidor");
@@ -61,14 +63,12 @@ public class TelaServidor extends javax.swing.JFrame {
 
         lblPortaServidor.setText("Porta Serviço:");
 
+        txtPortaServico.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes conectados"));
 
-        listClientes.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "TODOS" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         listClientes.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        listClientes.setEnabled(false);
         jScrollPane1.setViewportView(listClientes);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -90,37 +90,37 @@ public class TelaServidor extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblLog)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblPortaServidor)
-                            .addComponent(txtPortaServico, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(lblLog)
+                        .addGap(1, 1, 1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(lblPortaServidor)
+                        .addGap(5, 5, 5)
+                        .addComponent(txtPortaServico)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRegistrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(5, 5, 5)
+                        .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(10, 10, 10)
+                .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(lblPortaServidor)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtPortaServico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(3, 3, 3)
+                            .addComponent(btnRegistrar, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, 0)
                         .addComponent(lblLog)
                         .addGap(0, 0, 0)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -128,13 +128,14 @@ public class TelaServidor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        try{
+        try {
             Servidor servidor = new Servidor(Integer.parseInt(txtPortaServico.getText()), this);
+            txtPortaServico.setEnabled(false);
+            btnRegistrar.setEnabled(false);
+        } catch (Exception e) {
+            System.out.println("Erro: Mensagem: " + e.getMessage());
         }
-        catch(Exception e){
-            System.out.println("Erro: Mensagem: "+ e.getMessage());
-        }
-        
+
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     /**
@@ -211,16 +212,21 @@ public class TelaServidor extends javax.swing.JFrame {
     public void setListClientes(javax.swing.JList<String> listClientes) {
         this.listClientes = listClientes;
     }
-    
-    public void insereClienteLista(Cliente c){
+
+    public void insereClienteLista(Cliente c) {
         list_model.addCliente(c);
+        txtLog.append("Cliente " + c.getApelido() + " se conectou ao servidor.\n");
     }
-    
-    public void removeClienteLista(Cliente c){
+
+    public void removeClienteLista(Cliente c) {
         int i;
-        for(i = 0; i < list_model.getSize(); i++){
-            if(c.getApelido().equals(list_model.getElementAt(i))) break;
+        int tamanho = list_model.getSize(); //Pega o tamanho do list_model
+        for (i = 0; i < tamanho; i++) { //Percorre o list_model procurando o cliente a ser excluido
+            if (c.getApelido().equals(list_model.getElementAt(i))) {
+                list_model.removeCliente(i);
+                break;
+            }
         }
-        list_model.removeCliente(i);
+        txtLog.append("Cliente " + c.getApelido() + " se desconectou do servidor.\n");
     }
 }
