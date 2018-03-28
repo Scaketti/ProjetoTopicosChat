@@ -1,4 +1,4 @@
-package data;
+package mensagem;
 
 import java.util.ArrayList;
 import javax.swing.AbstractListModel;

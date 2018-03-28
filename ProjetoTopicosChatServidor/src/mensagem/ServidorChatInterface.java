@@ -1,4 +1,4 @@
-package data;
+package mensagem;
 
 
 import java.rmi.Remote;

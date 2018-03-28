@@ -5,8 +5,8 @@
  */
 package gui;
 
-import data.Cliente;
-import data.ClienteChatInterface;
+import mensagem.Cliente;
+import mensagem.ClienteChatInterface;
 
 /**
  *

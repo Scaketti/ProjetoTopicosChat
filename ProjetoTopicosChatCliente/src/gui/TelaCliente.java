@@ -5,12 +5,13 @@
  */
 package gui;
 
-import data.Cliente;
-import data.CustomListModel;
-import data.ServidorChatInterface;
+import mensagem.Cliente;
+import mensagem.CustomListModel;
+import mensagem.ServidorChatInterface;
 import java.rmi.Naming;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import mensagem.SimpleCrypto;
 
 /**
  *
@@ -227,8 +228,12 @@ public class TelaCliente extends javax.swing.JFrame {
         //Tenta enviar a mensagem para o servidor encaminhar ao outro cliente
         try {
             ServidorChatInterface servidor = (ServidorChatInterface) Naming.lookup("rmi://" + ipServidor + ":" + portaServidor + "/chat");
+
+            //Encripta a mensagem e salva como uma string
+            String msgCriptografada = SimpleCrypto.encrypt(getTxtMsgEnviar().getText());
+
             //Envia a mensagem ao servidor
-            int validacao = servidor.receberMensagemCliente(cliente.getApelido(), getListClientes().getSelectedValue(), getTxtMsgEnviar().getText());
+            int validacao = servidor.receberMensagemCliente(cliente.getApelido(), getListClientes().getSelectedValue(), msgCriptografada);
 
             if (validacao == 0) { //Caso a mensagem foi recebida
                 for (Cliente c : clientesConectados) { //Pesquisa o cliente selecionado no array
@@ -237,10 +242,10 @@ public class TelaCliente extends javax.swing.JFrame {
                         txtMsgs.setText(c.getLogMensagens());
                     }
                 }
-            }else{ //Caso a mensagem não foi recebida
+            } else { //Caso a mensagem não foi recebida
                 JOptionPane.showMessageDialog(null, "Não foi possível enviar a mensagem");
             }
-            
+
             getTxtMsgEnviar().setText("");
         } catch (Exception e) {
             System.out.println("Erro: Mensagem: " + e.getMessage());
@@ -383,6 +388,16 @@ public class TelaCliente extends javax.swing.JFrame {
                     }
                 }
             }
+        }
+    }
+
+    public void removeAllListaCliente() {
+        int listSize = list_model.getSize();
+        for (Cliente c : clientesConectados) { //Pesquisa o cliente com o nome a ser desconectado
+            clientesConectados.remove(c);
+        }
+        for (int i = 0; i < listSize; i++) { //Pesquisa no list_model o cliente
+            list_model.removeCliente(i);
         }
     }
 

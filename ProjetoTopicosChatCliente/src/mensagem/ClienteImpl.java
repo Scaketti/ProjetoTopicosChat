@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package data;
+package mensagem;
 
 import gui.TelaCliente;
 import java.rmi.RemoteException;
@@ -27,7 +27,12 @@ public class ClienteImpl extends UnicastRemoteObject implements ClienteChatInter
     public void receberMensagemServidor(String apelidoOrigem, String mensagem) throws RemoteException {
         //Procurar cliente na lista de clientes para poder salvar a mensagem no log de mensagens do objeto
         tCliente.getTxtLogCliente().append("Cliente " + apelidoOrigem + " enviou uma mensagem.\n");
-        tCliente.atualizaMensagemCliente(apelidoOrigem, mensagem);
+        try {
+            String msgDescriptografada = SimpleCrypto.decrypt(mensagem); //Descriptografa mensagem recebida pelo servidor
+            tCliente.atualizaMensagemCliente(apelidoOrigem, msgDescriptografada);
+        } catch (Exception e) {
+            System.out.println("Erro: Mensagem: " + e.getMessage());
+        }
     }
 
     @Override

@@ -5,9 +5,9 @@
  */
 package gui;
 
-import data.Cliente;
-import data.CustomListModel;
-import data.Servidor;
+import mensagem.Cliente;
+import mensagem.CustomListModel;
+import mensagem.Servidor;
 
 /**
  *
