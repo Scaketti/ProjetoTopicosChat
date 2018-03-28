@@ -5,6 +5,7 @@
  */
 package gui;
 
+import java.awt.Color;
 import mensagem.Cliente;
 import mensagem.CustomListModel;
 import mensagem.ServidorChatInterface;
@@ -356,23 +357,15 @@ public class TelaCliente extends javax.swing.JFrame {
         getTxtLogCliente().append("Cliente: " + c.getApelido() + " está conectado ao servidor.\n");
         clientesConectados.add(c);
         list_model.addCliente(c);
-
-        //Testes
-        System.out.println("Cliente conectado array");
-        for (Cliente cl : clientesConectados) {
-            System.out.println("Cliente conectado: " + cl.getApelido());
-        }
-
-        System.out.println("Cliente conectado lista");
-        for (int i = 0; i <= list_model.getSize(); i++) {
-            System.out.println("Cliente conectado: " + i + list_model.getCliente(i).getApelido());
-        }
     }
 
     public void atualizaMensagemCliente(String apelido, String mensagem) {
         for (Cliente c : clientesConectados) { //Pesquiso o cliente respectivo para atualizar seu log de mensagens
             if (c.getApelido().equals(apelido)) {
                 c.setLogMensagens(c.getLogMensagens() + "\n" + apelido + ": " + mensagem);
+                if (listClientes.getSelectedValue().equals(apelido)) {
+                    txtMsgs.append("\n" + apelido + ": " + mensagem); //Se o usuário enviar uma mensagem e ele ja estiver selecionado, atualiza na tela
+                }
             }
         }
     }
@@ -392,13 +385,8 @@ public class TelaCliente extends javax.swing.JFrame {
     }
 
     public void removeAllListaCliente() {
-        int listSize = list_model.getSize();
-        for (Cliente c : clientesConectados) { //Pesquisa o cliente com o nome a ser desconectado
-            clientesConectados.remove(c);
-        }
-        for (int i = 0; i < listSize; i++) { //Pesquisa no list_model o cliente
-            list_model.removeCliente(i);
-        }
+        clientesConectados.removeAll(clientesConectados);
+        list_model.removeAll();
     }
 
     public void atualizaDadosServidor(String ip, String porta) {

@@ -166,13 +166,13 @@ public class ConfigServidor extends javax.swing.JFrame {
         try {
             ServidorChatInterface servidor = (ServidorChatInterface) Naming.lookup("rmi://" + txtIpServidor.getText() + ":" + txtPortaServidor.getText() + "/chat");
             servidor.desconectar(c.getApelido(), c.getIp(), String.valueOf(c.getPorta()));
-            tCliente.removeAllListaCliente();
-            tCliente.atualizaDadosServidor("", ""); //Atualiza os campos da tela principal do cliente
-
         } catch (Exception e) {
             System.out.println("Erro: Mensagem: " + e.getMessage());
             validacao = false;
         }
+
+        tCliente.removeAllListaCliente();
+        tCliente.atualizaDadosServidor("", ""); //Atualiza os campos da tela principal do cliente
 
         if (validacao) {
             mudaEstadoConexao(false); //Muda botões em relacao a conexão

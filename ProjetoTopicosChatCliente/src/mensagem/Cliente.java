@@ -14,14 +14,15 @@ import sun.rmi.registry.RegistryImpl;
  * @author Scaketti
  */
 public class Cliente {
+
     private String nome;
     private String apelido;
     private String ip;
     private int porta;
     private String logMensagens;
     private boolean conectado;
-    
-    public Cliente(TelaCliente tCliente){
+
+    public Cliente(TelaCliente tCliente) {
         nome = "";
         apelido = "";
         ip = "localhost";
@@ -64,8 +65,6 @@ public class Cliente {
     public String getIp() {
         return ip;
     }
-    
-    
 
     /**
      * @param ip the ip to set
@@ -73,15 +72,13 @@ public class Cliente {
     public void setIp(String ip) {
         this.ip = ip;
     }
-    
-     /**
+
+    /**
      * @return the porta
      */
     public int getPorta() {
         return porta;
     }
-    
-    
 
     /**
      * @param porta the porta to set
@@ -103,20 +100,19 @@ public class Cliente {
     public void setLogMensagens(String logMensagens) {
         this.logMensagens = logMensagens;
     }
-    
-    public void registraCliente(TelaCliente tCliente){
-        try{
+
+    public void registraCliente(TelaCliente tCliente) {
+        try {
             //Registrando o serviço em uma determinada porta.
-            RegistryImpl registryImpl = new RegistryImpl(porta);    
+            RegistryImpl registryImpl = new RegistryImpl(porta);
 
             //Instanciando a classe ServidorImpl que é do tipo ServidorInterface.
-            ClienteChatInterface cliente = new ClienteImpl(tCliente);  
-            
+            ClienteChatInterface cliente = new ClienteImpl(tCliente);
+
             //Registra o Servidor
-            Naming.rebind("rmi://" + ip + ":" + porta + "/chat", cliente); 
-            System.out.println("Registrado Cliente");
-            
-        }catch(Exception e){
+            Naming.rebind("rmi://" + ip + ":" + porta + "/chat", cliente);
+
+        } catch (Exception e) {
             System.out.println("Erro : Mensagem : " + e.getMessage());
         }
     }
@@ -134,5 +130,5 @@ public class Cliente {
     public void setConectado(boolean conectado) {
         this.conectado = conectado;
     }
-    
+
 }

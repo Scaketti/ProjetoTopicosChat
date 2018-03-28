@@ -25,10 +25,14 @@ public class CustomListModel extends AbstractListModel {
 
     public void removeCliente(int index0) {
         lista.remove(index0);
-        this.fireIntervalRemoved(index0, getSize(), getSize() + 1);
+        this.fireIntervalRemoved(this, getSize(), getSize() + 1);
     }
-    
-    public Cliente getCliente(int index){
+
+    public void removeAll() {
+        lista.removeAll(lista);
+    }
+
+    public Cliente getCliente(int index) {
         return lista.get(index);
     }
 
